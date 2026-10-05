@@ -1,0 +1,46 @@
+#!/bin/sh
+
+set -eu
+
+BASE_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+MAVEN_VERSION=3.9.16
+ARCHIVE_NAME="apache-maven-${MAVEN_VERSION}-bin.zip"
+DIST_ROOT="${BASE_DIR}/.mvn/wrapper/dists/apache-maven-${MAVEN_VERSION}"
+MAVEN_HOME="${DIST_ROOT}/apache-maven-${MAVEN_VERSION}"
+ARCHIVE_PATH="${DIST_ROOT}/${ARCHIVE_NAME}"
+DOWNLOAD_URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/${ARCHIVE_NAME}"
+EXPECTED_SHA512="ed41650d42485cfc243fad22158caf9cbb5dc408ce7a09ddb94dd42a019de929ca43065bfa450612cf12bf78b5cafa3884b96c090de326ff590448c933454af3"
+
+verify_archive() {
+  if command -v sha512sum >/dev/null 2>&1; then
+    actual=$(sha512sum "$ARCHIVE_PATH" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    actual=$(shasum -a 512 "$ARCHIVE_PATH" | awk '{print $1}')
+  else
+    echo "Se requiere sha512sum o shasum para verificar Maven." >&2
+    exit 1
+  fi
+
+  if [ "$actual" != "$EXPECTED_SHA512" ]; then
+    echo "La descarga de Maven no coincide con el SHA-512 oficial." >&2
+    exit 1
+  fi
+}
+
+if [ ! -x "${MAVEN_HOME}/bin/mvn" ]; then
+  mkdir -p "$DIST_ROOT"
+  if [ ! -f "$ARCHIVE_PATH" ]; then
+    if command -v curl >/dev/null 2>&1; then
+      curl --fail --location --silent --show-error "$DOWNLOAD_URL" --output "$ARCHIVE_PATH"
+    elif command -v wget >/dev/null 2>&1; then
+      wget --quiet "$DOWNLOAD_URL" --output-document="$ARCHIVE_PATH"
+    else
+      echo "Se requiere curl o wget para descargar Maven." >&2
+      exit 1
+    fi
+  fi
+  verify_archive
+  unzip -q -o "$ARCHIVE_PATH" -d "$DIST_ROOT"
+fi
+
+exec "${MAVEN_HOME}/bin/mvn" "$@"
