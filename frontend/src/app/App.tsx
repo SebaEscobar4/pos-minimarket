@@ -222,19 +222,19 @@ function AuthenticatedHome({
   const sections: { id: WorkspaceSection; label: string }[] =
     session.role === 'ADMIN'
       ? [
-        { id: 'SALES', label: 'Ventas' },
-        { id: 'INVENTORY', label: 'Inventario' },
-        { id: 'CATALOG', label: 'Productos' },
-        { id: 'CASH', label: 'Caja' },
-        { id: 'AUDIT', label: 'Auditor\u00eda' },
-        { id: 'REPORTS', label: 'Reportes' },
-        { id: 'SEARCH', label: 'Consulta' },
-      ]
+          { id: 'SALES', label: 'Ventas' },
+          { id: 'INVENTORY', label: 'Inventario' },
+          { id: 'CATALOG', label: 'Productos' },
+          { id: 'CASH', label: 'Caja' },
+          { id: 'AUDIT', label: 'Auditor\u00eda' },
+          { id: 'REPORTS', label: 'Reportes' },
+          { id: 'SEARCH', label: 'Consulta' },
+        ]
       : [
-        { id: 'SALES', label: 'Ventas' },
-        { id: 'CASH', label: 'Caja' },
-        { id: 'SEARCH', label: 'Consulta' },
-      ]
+          { id: 'SALES', label: 'Ventas' },
+          { id: 'CASH', label: 'Caja' },
+          { id: 'SEARCH', label: 'Consulta' },
+        ]
 
   async function signOut() {
     setError('')
